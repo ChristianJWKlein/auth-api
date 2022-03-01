@@ -21,7 +21,7 @@ exports.createUser = (req, res) => {
   const db = connectDb();
   db.collection('users')
     .add(newUser)
-    .then(() => {
+    .then((doc) => {
       const user = {
         id: doc.id,
         email: newUser.email,
