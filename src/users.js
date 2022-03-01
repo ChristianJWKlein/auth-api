@@ -4,7 +4,10 @@ exports.createUser = (req, res) => {
   // first, lets do some vailidation.. valid email, valid password
   if (!req.body || !req.body.email || !req.body.password) {
     //say that this is an invalid request
-    res.status(400).send('Invalid Request');
+    res.status(400).send({
+      success: false,
+      message: 'Invalid Request',
+    });
     return; //return because express does not like to res.sends in a single post
   }
   const newUser = {
@@ -42,9 +45,12 @@ exports.createUser = (req, res) => {
     );
 };
 
-exports.loginUser = () => {
+exports.loginUser = (req, res) => {
   if (!req.body || !req.body.email || !req.body.password) {
-    res.status(400).send('Invalid Request');
+    res.status(400).send({
+      success: false,
+      message: 'Invalid Request',
+    });
     return;
   }
   const db = connectDb();
@@ -71,7 +77,7 @@ exports.loginUser = () => {
       res.send({
         success: true,
         message: 'Login Succesful',
-        token: users[0],
+        token: users[0], //sends back the first user with thomas@myspace.com
       });
     })
     .catch((err) =>
