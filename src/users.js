@@ -88,3 +88,30 @@ exports.loginUser = (req, res) => {
       })
     );
 };
+
+exports.getUsers = (req, res) => {
+  //TODO protect this route with JWT
+  const db = connectDb();
+  db.collection('users')
+    .get()
+    .then((snapshot) => {
+      const users = snapshot.docs.map((doc) => {
+        let user = doc.data();
+        user.id = doc.id;
+        user.password = undefined;
+        return user;
+      });
+      res.send({
+        success: true,
+        message: 'Users returned',
+        users,
+      });
+    })
+    .catch((err) =>
+      res.status(500).send({
+        success: false,
+        message: err.message,
+        error: err,
+      })
+    );
+};
