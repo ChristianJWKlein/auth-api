@@ -21,3 +21,5 @@
 3. Secure API Point that checks the users Token
 
 ### Users Collection
+
+### other keys.. Never advise email and password are wrong. makes the hacker halfway there
