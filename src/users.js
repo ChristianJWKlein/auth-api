@@ -1,3 +1,4 @@
+const jwt = require('jsonwebtoken');
 const { connectDb } = require('./dbConnect');
 
 exports.createUser = (req, res) => {
@@ -29,11 +30,11 @@ exports.createUser = (req, res) => {
         userRole: 5,
       };
 
-      //TODO: create a JWT and Send back the token
+      const token = jwt.sign(user, 'doNotShareYourSecret'); //protect this secret
       res.status(201).send({
         success: true,
         message: 'Account Created',
-        token: user, //add this to token later
+        token,
       });
     })
     .catch((err) =>
@@ -74,10 +75,11 @@ exports.loginUser = (req, res) => {
         user.password = undefined;
         return user;
       });
+      const token = jwt.sign(user[0], 'doNotShareYourSecret'); //protect this secret
       res.send({
         success: true,
         message: 'Login Succesful',
-        token: users[0], //sends back the first user with thomas@myspace.com
+        token, // user[0]sends back the first user with thomas@myspace.com
       });
     })
     .catch((err) =>
@@ -90,7 +92,24 @@ exports.loginUser = (req, res) => {
 };
 
 exports.getUsers = (req, res) => {
-  //TODO protect this route with JWT
+  //before protect..Make sure user sent authorization token
+  if (!req.headers.authorization) {
+    return res.status(403).send({
+      success: false,
+      message: 'No Authorization token found',
+    });
+  }
+  //protect this route with JWT
+  //In practice we would write a function called middleware... add in app.get / app.post
+
+  const decode = jwt.verify(req.headers.authorization, 'doNotShareYourSecret');
+  console.log('NEW REQUEST BY: ', decode.email);
+  if (decode.userRole > 5) {
+    return res.status(401).send({
+      succes: false,
+      message: 'Not Authorized',
+    });
+  }
   const db = connectDb();
   db.collection('users')
     .get()
